@@ -1,0 +1,47 @@
+nohup: ignoring input
+2023-10-07 22:43:01 INFO     server listening on 0.0.0.0:9000
+INFO:server listening on 0.0.0.0:9000
+2023-10-07 22:43:01 INFO     server listening on 0.0.0.0:9001
+INFO:server listening on 0.0.0.0:9001
+2023-10-07 22:43:01 INFO     server listening on 0.0.0.0:9002
+INFO:server listening on 0.0.0.0:9002
+2023-10-07 22:43:01 INFO     server listening on 0.0.0.0:9100
+INFO:server listening on 0.0.0.0:9100
+2023-10-07 22:43:01 INFO     Server Started listening to new connections...
+INFO:Server Started listening to new connections...
+2023-10-07 22:43:12 INFO     connection failed (200 OK)
+INFO:connection failed (200 OK)
+2023-10-07 22:43:12 INFO     connection closed
+INFO:connection closed
+2023-10-07 22:43:14 INFO     connection open
+INFO:connection open
+2023-10-07 22:43:14 INFO     Admin connection from ('165.225.17.39', 35007)
+INFO:Admin connection from ('165.225.17.39', 35007)
+2023-10-07 22:43:14 INFO     admins: {('165.225.17.39', 35007): <admin.AdminSession object at 0x7fc2a21e3ac0>}
+INFO:admins: {('165.225.17.39', 35007): <admin.AdminSession object at 0x7fc2a21e3ac0>}
+2023-10-07 22:43:15 INFO     receive message {"action":"message","msg":"list"}
+INFO:receive message {"action":"message","msg":"list"}
+2023-10-07 22:46:34 INFO     connection open
+INFO:connection open
+2023-10-07 22:46:34 INFO     Connection from ('185.100.174.141', 61351) on local address ('172.31.22.132', 9000)
+INFO:Connection from ('185.100.174.141', 61351) on local address ('172.31.22.132', 9000)
+2023-10-07 22:46:34 INFO     Protocols Matched: ocpp1.6
+INFO:Protocols Matched: ocpp1.6
+2023-10-07 22:46:35 INFO     HIVE_003083: receive message [2,"5","StatusNotification",{"connectorId":1,"errorCode":"NoError","status":"Available","timestamp":"2022-10-28T14:29:04Z"}]
+INFO:HIVE_003083: receive message [2,"5","StatusNotification",{"connectorId":1,"errorCode":"NoError","status":"Available","timestamp":"2022-10-28T14:29:04Z"}]
+2023-10-07 22:46:35 INFO     connector_id: 1, status: Available, error_code: NoError
+INFO:connector_id: 1, status: Available, error_code: NoError
+2023-10-07 22:46:35 INFO     HIVE_003083: send [3,"5",{}]
+INFO:HIVE_003083: send [3,"5",{}]
+2023-10-07 22:46:42 INFO     receive message {"action":"message","msg":"manage HIVE_003083"}
+INFO:receive message {"action":"message","msg":"manage HIVE_003083"}
+2023-10-07 22:46:42 INFO     managing HIVE_003083
+INFO:managing HIVE_003083
+2023-10-07 22:55:07 INFO     HIVE_003083: receive message [2,"6","Heartbeat",{}]
+INFO:HIVE_003083: receive message [2,"6","Heartbeat",{}]
+2023-10-07 22:55:07 INFO     HIVE_003083: send [3,"6",{"currentTime":"2023-10-07T22:55:07.131Z"}]
+INFO:HIVE_003083: send [3,"6",{"currentTime":"2023-10-07T22:55:07.131Z"}]
+2023-10-07 23:10:07 INFO     HIVE_003083: receive message [2,"7","Heartbeat",{}]
+INFO:HIVE_003083: receive message [2,"7","Heartbeat",{}]
+2023-10-07 23:10:07 INFO     HIVE_003083: send [3,"7",{"currentTime":"2023-10-07T23:10:07.349Z"}]
+INFO:HIVE_003083: send [3,"7",{"currentTime":"2023-10-07T23:10:07.349Z"}]

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<head>
+    <script type="text/javascript">
+window.log = function (message, data) {
+    const logger = document.getElementById("log")
+    logger.value += new Date().toLocaleTimeString() + " "
+    logger.value += message
+    if (data) {
+        logger.value += " " + data
+    }
+    logger.value += "\n"
+    logger.scrollTop = logger.scrollHeight;
+}
+
+let chargerSelect = null
+let configTable = null
+
+let socket = null
+
+let selectCharger = function() {
+    window.ask('manage '+chargerSelect.options[chargerSelect.selectedIndex].value)
+}
+
+let listChargers = function() {
+    window.ask('list')
+}
+
+function populateConfigTable(data) {
+    document.getElementById('configsection').hidden = false
+    let tbody = configTable.getElementsByTagName('tbody')[0]
+    for (item of data) {
+        console.log(item)
+        let newRow = tbody.insertRow()
+        newRow.insertCell().appendChild(document.createTextNode(item['component']['name']))
+        newRow.insertCell().appendChild(document.createTextNode(item['variable']['name']))
+        newRow.insertCell().appendChild(document.createTextNode(item['variable_attribute'][0]['value']))
+    }
+}
+
+function populateConfigTable16(data) {
+    document.getElementById('configsection').hidden = false
+    let tbody = configTable.getElementsByTagName('tbody')[0]
+    for (item of data) {
+        console.log(item)
+        let newRow = tbody.insertRow()
+        newRow.insertCell().appendChild(document.createTextNode("n/a"))
+        newRow.insertCell().appendChild(document.createTextNode(item['key']))
+        newRow.insertCell().appendChild(document.createTextNode(item['value']))
+        newRow.insertCell().appendChild(document.createTextNode(item['readonly']))
+    }
+}
+
+function clearConfigTable() {
+    let tbody = configTable.getElementsByTagName('tbody')[0]
+    let newTbody = document.createElement('tbody')
+    tbody.parentNode.replaceChild(newTbody, tbody)
+    document.getElementById('configsection').hidden = true
+}
+
+function eraseText() {
+    document.getElementById("log").value = ""
+}
+
+function addListeners() {
+    socket.addEventListener('open', e => {
+        window.log('Websocket is connected', JSON.stringify(e))
+        document.getElementById("state").textContent = 'CONNECTED'
+    })
+
+    socket.addEventListener('close', e => {
+        window.log('Websocket is closed', JSON.stringify(e))
+        document.getElementById("state").textContent = 'CLOSED'
+    })
+
+    socket.addEventListener('error', e => {
+        window.log('Websocket is error', JSON.stringify(e))
+        document.getElementById("state").textContent = 'ERROR'
+    })
+
+    socket.addEventListener('message', e => {
+        window.log(JSON.parse(JSON.stringify(e.data)))
+        try {
+            messageContent = JSON.parse(e.data)
+            if (messageContent.messageType) {
+                if (messageContent.messageType === 'Chargers') {
+                    if (chargerSelect.options) {
+                        while (chargerSelect.options.length > 0) {
+                            chargerSelect.remove(0)
+                        }
+                    }
+                    for (c of messageContent.payload) {
+                        chargerSelect.options[chargerSelect.options.length] = new Option(c, c);
+                    }
+                }
+                else if (messageContent.messageType === 'ProxyChargers') {
+                    if (proxyChargerSelect.options) {
+                        while (proxyChargerSelect.options.length > 0) {
+                            proxyChargerSelect.remove(0)
+                        }
+                    }
+                    for (c of messageContent.payload) {
+                        proxyChargerSelect.options[proxyChargerSelect.options.length] = new Option(`${c.id} -> ${c.uri}`, c.id);
+                    }
+                }
+                else if (messageContent.messageType === 'Config2.0.1') {
+                    populateConfigTable(messageContent.payload)
+                }
+                else if (messageContent.messageType === 'Config1.6') {
+                    populateConfigTable16(messageContent.payload)
+                }
+            }
+        } catch (err) {
+            console.log('Unexpected message format')
+        }
+    })
+}
+
+window.ask = function (msg) {
+    if (msg.startsWith('getconfig')) {
+        clearConfigTable()
+    }
+    const payload = {
+        action: 'message',
+        msg
+    }
+    socket.send(JSON.stringify(payload))
+}
+
+document.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        window.log("asking", document.getElementById("msgToSend").value)
+        window.ask(document.getElementById("msgToSend").value)
+        document.getElementById("msgToSend").value = ''
+        return false;
+    }
+});
+
+window.onload = (event) => {
+    const button = document.getElementById("connect")
+    button.addEventListener('click', function (e) {
+        if (socket) {
+            socket.close()
+        }
+        socket = new WebSocket('ws://' + window.location.host)
+        chargerSelect = document.getElementById("chargers")
+        chargerSelect.onchange = selectCharger
+        proxyChargerSelect = document.getElementById("proxyChargers")
+        configTable = document.getElementById("config")
+        addListeners()
+        setTimeout(listChargers, 1000)
+    });
+
+    document.getElementById("getconfiguration").addEventListener('click' , () => {
+       /* if (msg.startsWith('getconfig')) {
+            clearConfigTable()
+        }
+        const payload = {
+            action : 'message',
+            msg
+        }
+        socket.send(JSON.stringify(payload)) */
+    
+        const msg = 'getconfig';
+        clearConfigTable()
+        const payload = {
+            action : 'message',
+            msg
+        }
+       
+       /* document.getElementById("msgToSend").value = msg;
+        window.log("asking", msg);
+        window.ask(msg);*/
+        socket.send(JSON.stringify(payload));
+    });
+    document.getElementById("trigger boot notification").addEventListener('click' , () => {
+        const msg = 'triggerbootnotification';
+        clearConfigTable()
+        const payload = {
+            action : 'message',
+            msg
+        }
+        socket.send(JSON.stringify(payload));
+
+        /*document.getElementById("msgToSend").value = msg;
+        window.log("asking", msg);
+        window.ask(msg);*/
+    });
+    document.getElementById("reboot").addEventListener('click' , () => {
+        const msg = 'reboot';
+        clearConfigTable()
+        const payload = {
+            action : 'message',
+            msg
+        }
+        socket.send(JSON.stringify(payload));
+        /*document.getElementById("msgToSend").value = msg;
+        window.log("asking" , msg);
+        window.ask(msg);*/
+    });
+    
+
+
+};
+    </script>
+    <style>
+tr:nth-child(even) {background: #CCC}
+tr:nth-child(odd) {background: #EEE}
+.container{
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    width: 300px;
+    margin: 0;
+}
+.container button {
+    width: 50%;
+    padding: 5px 10px;
+    margin: 5px 0;
+    cursor: pointer;
+        }
+        </style>
+</head>
+<body>
+    <h2>Admin Connection</h2>
+    <p><button id="connect">Connect</button> status: <span id="state">(not connected)</span> </p>
+    <h2>Chargers online</h2>
+    <div style="display:flex;">
+    <div><h3>Connected here</h3><select id="chargers" name="chargers" size="4"></select></div>
+    <div style="padding-left: 40px; flex-grow:1;"><h3>Proxied</h3><select id="proxyChargers" name="proxyChargers" size="4" disabled></select></div></p>
+    </div><br>
+    <div class="container">
+    <button id="getconfiguration">GetConfiguration</button> <button id="reboot">Reboot</button> 
+    <button id="trigger boot notification">Trigger Boot Notification</button>
+    <button id="eo ota">EO OTA</button> <input type="text" id="sendota">
+    <button id="set">Set</button> <input type="text" id="sendconfig">
+</div>
+    
+    <p><span>Send command:</span> <input type="text" id="msgToSend" size="32"/></p>
+    <h2>Message log (all chargers)</h2>
+    <p><textarea id="log" rows="10" cols="80"></textarea></p>
+    <p><button id="clear" onclick="javascript:eraseText()">Clear</button></p>
+    <div id="configsection" hidden>
+        <h2>Configuration</h2>
+        <table id="config">
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Variable</th>
+                    <th>Value</th>
+                    <th>Read-only?</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    <div>
+</body>
+</html>
